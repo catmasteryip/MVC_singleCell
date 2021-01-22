@@ -1,0 +1,28 @@
+import os
+import numpy as np
+import time
+
+from PyQt5.QtCore import QThread, Qt, pyqtSignal, pyqtSlot
+from PyQt5.QtGui import QImage, QPixmap
+
+class PressureThread(QThread):
+    pressureFloat = pyqtSignal(float)
+
+    def __init__(self, pressureQueue):
+        super(QThread,self).__init__()
+        self.pressureQueue = pressureQueue
+
+    def run(self):
+        i = 0
+        pressure_csv = read_pressure_csv('resources/pressure.csv')
+        while True:
+            time.sleep(0.1)
+            pressure = pressure_csv[i]
+            i = i+1
+            self.pressureQueue.put(pressure)
+            self.pressureFloat.emit(pressure)
+
+def read_pressure_csv(filepath):
+    pressure = np.genfromtxt(filepath, delimiter=',')
+    pressure = pressure[~np.isnan(pressure)]
+    return pressure
