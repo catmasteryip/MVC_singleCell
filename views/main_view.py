@@ -23,8 +23,10 @@ class MainView(QMainWindow):
         self._model.frameSignal.connect(self.setImage)
         self._model.lengthText.connect(self.setLength)
         self._model.pressureText.connect(self.setPressure)
+        self._model.agText.connect(self.setAg)
         self._model.pressureFloat.connect(self._ui.graphWidget.myFig._update_canvas_)
         self._model.lengthFloat.connect(self._ui.lengthGraphWidget.myFig._update_canvas_)
+
         
         # set a default values to controller
 

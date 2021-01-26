@@ -60,7 +60,7 @@ class Ui_MainWindow(object):
         self.gridLayout_2 = QtWidgets.QGridLayout(self.gridLayoutWidget_2)
         self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_2.setObjectName("gridLayout_2")
-        self.lengthGraphWidget = mplwidget(self.gridLayoutWidget_2,x_len=200, y_range = [-0.5, 0.5])
+        self.lengthGraphWidget = mplwidget(self.gridLayoutWidget_2)
         self.lengthGraphWidget.setObjectName("lengthGraphWidget")
         self.gridLayout_2.addWidget(self.lengthGraphWidget, 2, 0, 1, 1)
         self.graphWidget = mplwidget(self.gridLayoutWidget_2)

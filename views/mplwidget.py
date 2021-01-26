@@ -1,6 +1,7 @@
 # Imports
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSlot
+import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvas
 import matplotlib
@@ -11,7 +12,7 @@ matplotlib.use('QT5Agg')
 
 # Matplotlib widget
 class MplWidget(QtWidgets.QWidget):
-    def __init__(self, parent=None, x_len=20, y_range=[-0.5, 0.5]):
+    def __init__(self, parent=None, x_len=200, y_range=[-0.5, 0.5]):
         QtWidgets.QWidget.__init__(self, parent)   # Inherit from QWidget
         self.lyt = QtWidgets.QVBoxLayout()         # Set box for plotting
         self.setLayout(self.lyt)
@@ -29,7 +30,7 @@ class MplCanvas(FigureCanvas):
     This is the FigureCanvas in which the live plot is drawn.
 
     '''
-    def __init__(self, x_len:int, y_range:list) -> None:
+    def __init__(self, x_len=200, y_range=[-0.5, 0.5]) -> None:
         '''
         :param x_len:       The nr of data points shown in one plot.
         :param y_range:     Range on y-axis.
@@ -53,40 +54,33 @@ class MplCanvas(FigureCanvas):
         return
 
     @pyqtSlot(float)
-    def _update_canvas_(self, pressureFloat) -> None:
+    def _update_canvas_(self, dataFloat) -> None:
         '''
         This function gets called on-demand by pyqtSignal
 
         '''
-        with open("logs.txt", "a") as f:
-                f.write(f"""
-                {self._y_}
-                """)
-                f.close()
         y = 0
-        if pressureFloat is not None:
-            y = pressureFloat
-        self._y_.append(y)
-
-        # self._y_.append(round(get_next_datapoint(), 2))     # Add new datapoint
+        if dataFloat is not None:
+            y = dataFloat
+        self._y_.append(y)                                  # Add new datapoint
         self._y_ = self._y_[-self._x_len_:]                 # Truncate list y
-        
-
-        # New code
-        # ---------
         self._line_.set_ydata(self._y_)
         
+        # update y_lim
+        need_to_redraw = False
         y = np.array(self._y_)
         y = y[~np.isnan(y)]
         if sum(y) > 0:
-            y_min = min(y)
-            y_max = max(y)
-            self._y_range_ = [ y_min-y_min/10, y_max+y_max/10 ]
-            
-        self._ax_.set_ylim(ymin=self._y_range_[0], ymax=self._y_range_[1])  # update y_lim
+            if min(y) < self._y_range_[0] or max(y) > self._y_range_[1]:
+                need_to_redraw = True
+                self._y_range_ = [min(np.append(y,self._y_range_)),max(np.append(y,self._y_range_))]
+                self._ax_.set_ylim(ymin=self._y_range_[0], ymax=self._y_range_[1]) 
             
         self._ax_.draw_artist(self._ax_.patch)
         self._ax_.draw_artist(self._line_)
-        self.update()
+        if need_to_redraw:
+            self.draw()
+        else:
+            self.update()
         self.flush_events()
         return

@@ -32,6 +32,7 @@ class MainController(QObject):
                                                  pressureQueue = self.pressureQueue,
                                                  length_ratio = 3.46,
                                                  agQueue = self.agQueue)
+        self._calculateAgThread.agFloat.connect(self.update_ag)
 
         
         self._cvThread.start()
@@ -49,3 +50,7 @@ class MainController(QObject):
     @pyqtSlot(float)
     def update_pressure(self, pressureFloat):
         self._model.pressure = pressureFloat
+
+    @pyqtSlot(float)
+    def update_ag(self, agFloat):
+        self._model.ag = agFloat

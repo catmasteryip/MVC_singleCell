@@ -53,6 +53,6 @@ class Model(QObject):
     @ag.setter
     def ag(self, ag):
         self._ag = ag
-        self.agText.emit(ag)
+        self.agText.emit(f'{ag}')
 
     
