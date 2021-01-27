@@ -3,7 +3,8 @@ from PyQt5.QtCore import pyqtSlot
 from PyQt5 import QtCore
 from views.main_view_ui import Ui_MainWindow
 from PyQt5.QtGui import QImage, QPixmap
-from views.mplwidget import MplCanvas
+# from views.mplwidget import MplCanvas
+import time
 
 
 class MainView(QMainWindow):
@@ -24,11 +25,14 @@ class MainView(QMainWindow):
         self._model.lengthText.connect(self.setLength)
         self._model.pressureText.connect(self.setPressure)
         self._model.agText.connect(self.setAg)
-        self._model.pressureFloat.connect(self._ui.graphWidget.myFig._update_canvas_)
-        self._model.lengthFloat.connect(self._ui.lengthGraphWidget.myFig._update_canvas_)
+        self._model.pressureFloat.connect(self._ui.graphWidget.update_plot)
+        self._model.lengthFloat.connect(self._ui.lengthGraphWidget.update_plot)
 
         
         # set a default values to controller
+        x = list(range(0, 200))
+        y = [0]*len(x)
+        self._ui.graphWidget.plot(x, y)
 
     @pyqtSlot(QImage)
     def setImage(self, image):

@@ -9,7 +9,6 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from views.mplwidget import MplWidget as mplwidget
 
 
 class Ui_MainWindow(object):
@@ -60,10 +59,10 @@ class Ui_MainWindow(object):
         self.gridLayout_2 = QtWidgets.QGridLayout(self.gridLayoutWidget_2)
         self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_2.setObjectName("gridLayout_2")
-        self.lengthGraphWidget = mplwidget(self.gridLayoutWidget_2)
+        self.lengthGraphWidget = realTimePlotWidget(self.gridLayoutWidget_2)
         self.lengthGraphWidget.setObjectName("lengthGraphWidget")
         self.gridLayout_2.addWidget(self.lengthGraphWidget, 2, 0, 1, 1)
-        self.graphWidget = mplwidget(self.gridLayoutWidget_2)
+        self.graphWidget = realTimePlotWidget(self.gridLayoutWidget_2)
         self.graphWidget.setObjectName("graphWidget")
         self.gridLayout_2.addWidget(self.graphWidget, 1, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
@@ -91,4 +90,5 @@ class Ui_MainWindow(object):
         self.label_3.setText(_translate("MainWindow", "Ag"))
         self.agLabel.setText(_translate("MainWindow", "agLabel"))
         self.label_4.setText(_translate("MainWindow", "(Unit)"))
-# from mplwidget import mplwidget
+
+from views.plotwidget import realTimePlotWidget

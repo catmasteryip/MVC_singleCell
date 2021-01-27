@@ -113,10 +113,10 @@
     </property>
     <layout class="QGridLayout" name="gridLayout_2">
      <item row="2" column="0">
-      <widget class="mplwidget" name="lengthGraphWidget" native="true"/>
+      <widget class="PlotWidget" name="lengthGraphWidget" native="true"/>
      </item>
      <item row="1" column="0">
-      <widget class="mplwidget" name="graphWidget" native="true"/>
+      <widget class="PlotWidget" name="graphWidget" native="true"/>
      </item>
     </layout>
    </widget>
@@ -135,9 +135,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>mplwidget</class>
+   <class>PlotWidget</class>
    <extends>QWidget</extends>
-   <header>mplwidget.h</header>
+   <header>pyqtgraph</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

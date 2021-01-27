@@ -20,6 +20,7 @@ class CVThread(QThread):
         initBB = (852,553,243,18)
         self.cv2_imagepipe('resources/testing.avi',initBB)
         
+    @pyqtSlot(tuple)
     def cv2_imagepipe(self, vid_path, initBB):
         """
         Get image from video via cv2, process frames and send results to QThread
