@@ -1,9 +1,8 @@
 from PyQt5.QtWidgets import QMainWindow
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5 import QtCore
 from views.main_view_ui import Ui_MainWindow
 from PyQt5.QtGui import QImage, QPixmap
-# from views.mplwidget import MplCanvas
 import time
 
 
@@ -15,9 +14,24 @@ class MainView(QMainWindow):
         self._main_controller = main_controller
         self._ui = Ui_MainWindow()
         self._ui.setupUi(self)
-        # override lengthGraphWidget
+        self.restart=False
+
+        # control ui elements
+        self._ui.startButton.clicked.connect(self.startButtonPressed)
+        self._ui.stopButton.clicked.connect(self.stopButtonPressed)
+        self._ui.pauseButton.clicked.connect(self.pauseButtonPressed)
 
         # connect ui elements to controller
+        self._ui.startButton.clicked.connect(self._main_controller.startButtonPressed)
+        self._ui.startButton.clicked.connect(self.startButtonPressed)
+
+        self._ui.stopButton.clicked.connect(self._main_controller.stopButtonPressed)
+        self._ui.stopButton.clicked.connect(self.stopButtonPressed)
+
+        self._ui.resetBBButton.clicked.connect(self._main_controller.resetBBButtonPressed)
+        # self._ui.resetBBButton.clicked.connect(self.resetBBButtonPressed)
+
+        self._ui.pauseButton.clicked.connect(self._main_controller.pauseButtonPressed)
 
 
         # listen for model event signals
@@ -30,11 +44,35 @@ class MainView(QMainWindow):
 
         
         # set a default values to controller
-        x = list(range(0, 200))
-        y = [0]*len(x)
-        self._ui.graphWidget.plot(x, y)
+        self._ui.startButton.setEnabled(True)
+        self._ui.stopButton.setEnabled(False)
+        self._ui.pauseButton.setEnabled(False)
 
-    @pyqtSlot(QImage)
+
+    @pyqtSlot(bool)
+    def startButtonPressed(self):
+        if self.restart:
+            self.__init__()
+        else:
+            self._ui.startButton.setEnabled(False)
+        self._ui.stopButton.setEnabled(True)
+        self._ui.pauseButton.setEnabled(True)
+
+    @pyqtSlot(bool)
+    def stopButtonPressed(self):
+        self._ui.startButton.setText('RESTART')
+        self.restart = True
+        self._ui.startButton.setEnabled(True)
+        self._ui.stopButton.setEnabled(False)
+        self._ui.pauseButton.setEnabled(True)
+
+    @pyqtSlot(bool)
+    def pauseButtonPressed(self):
+        self._ui.startButton.setEnabled(True)
+        self._ui.stopButton.setEnabled(True)
+        self._ui.pauseButton.setEnabled(False)
+
+    @pyqtSlot(object)
     def setImage(self, image):
         w = self._ui.imageLabel.width()
         h = self._ui.imageLabel.height()

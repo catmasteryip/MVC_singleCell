@@ -17,9 +17,9 @@
    <widget class="QLabel" name="imageLabel">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>20</x>
       <y>60</y>
-      <width>361</width>
+      <width>391</width>
       <height>281</height>
      </rect>
     </property>
@@ -30,8 +30,8 @@
    <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>220</x>
-      <y>400</y>
+      <x>70</x>
+      <y>410</y>
       <width>274</width>
       <height>80</height>
      </rect>
@@ -113,10 +113,50 @@
     </property>
     <layout class="QGridLayout" name="gridLayout_2">
      <item row="2" column="0">
-      <widget class="PlotWidget" name="lengthGraphWidget" native="true"/>
+      <widget class="RealTimePlotWidget" name="lengthGraphWidget" native="true"/>
      </item>
      <item row="1" column="0">
-      <widget class="PlotWidget" name="graphWidget" native="true"/>
+      <widget class="RealTimePlotWidget" name="graphWidget" native="true"/>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>340</y>
+      <width>390</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="startButton">
+       <property name="text">
+        <string>START</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pauseButton">
+       <property name="text">
+        <string>PAUSE</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="stopButton">
+       <property name="text">
+        <string>STOP</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="resetBBButton">
+       <property name="text">
+        <string>Reset BB</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>
@@ -135,9 +175,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>PlotWidget</class>
+   <class>RealTimePlotWidget</class>
    <extends>QWidget</extends>
-   <header>pyqtgraph</header>
+   <header>views.realTimePlotWidget</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

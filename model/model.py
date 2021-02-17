@@ -3,7 +3,8 @@ from PyQt5.QtGui import QImage
 
 
 class Model(QObject):
-    frameSignal = pyqtSignal(QImage)
+    frameSignal = pyqtSignal(object)
+    rawFrameSignal = pyqtSignal(object)
     lengthText = pyqtSignal(str)
     lengthFloat = pyqtSignal(float)
     pressureText = pyqtSignal(str)
@@ -16,6 +17,27 @@ class Model(QObject):
         self._length = None
         self._pressure = None
         self._ag = None
+        self._rawFrame = None
+        self._boundingBox = None
+
+    @property
+    def boundingBox(self):
+        return self._boundingBox
+
+    @boundingBox.setter
+    def boundingBox(self, bb):
+        self._boundingBox = bb
+        print(self._boundingBox)
+        # self.boundingBox.emit(tuple)
+
+    @property
+    def rawFrame(self):
+        return self._rawFrame
+
+    @rawFrame.setter
+    def rawFrame(self, p):
+        self._rawFrame = p
+        self.rawFrameSignal.emit(p)
 
     @property
     def frame(self):

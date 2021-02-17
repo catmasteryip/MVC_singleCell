@@ -3,7 +3,7 @@ from PyQt5.QtCore import pyqtSlot
 from PyQt5 import QtWidgets
 from pyqtgraph import PlotWidget
 
-class realTimePlotWidget(PlotWidget):
+class RealTimePlotWidget(PlotWidget):
     def __init__(self, parent=None, x_len=200, y_range=[-0.5, 0.5]):
         PlotWidget.__init__(self, parent)
         # Range settings

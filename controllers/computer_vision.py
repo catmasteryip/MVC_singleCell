@@ -3,24 +3,38 @@ import os
 import numpy as np
 import time
 import math
-
+import threading
 from PyQt5.QtCore import QThread, Qt, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QImage, QPixmap
 
 class CVThread(QThread):
-    changePixmap = pyqtSignal(QImage)
+    changePixmap = pyqtSignal(object)
+    rawFrame = pyqtSignal(object)
     lengthFloat = pyqtSignal(float)
 
-    def __init__(self, lengthQueue):
+    def __init__(self, lengthQueue, initBB = (852,553,243,18)):
         super(QThread,self).__init__()
         self.lengthQueue = lengthQueue
         self.backSub_buffer = cv2.createBackgroundSubtractorKNN(dist2Threshold=100., detectShadows=False)
+        self.initBB = initBB
+        self.running = False
+        self.stopped = False
+        # self._lock = threading.Lock()
 
     def run(self):
-        initBB = (852,553,243,18)
-        self.cv2_imagepipe('resources/testing.avi',initBB)
-        
-    @pyqtSlot(tuple)
+        print('CVThread triggered')
+        self.cv2_imagepipe('resources/testing.avi',self.initBB)
+        self.exit()
+
+    def _stop(self):
+        self.stopped = True
+    
+    def pause(self):
+        self.running = False
+
+    def _start(self):
+        self.running = True
+
     def cv2_imagepipe(self, vid_path, initBB):
         """
         Get image from video via cv2, process frames and send results to QThread
@@ -32,24 +46,32 @@ class CVThread(QThread):
         cap = cv2.VideoCapture(vid_path)
         backSub = self.backSub_buffer
         while True:
-            ret, frame = cap.read()
-            if ret:
-                """
-                Special comments:
-                computer_vision function converts frame
-                """
-                
-                frame, protrusion_length = self.computer_vision(frame, backSub, initBB)
+            if self.running:
+                ret, rawFrame = cap.read()
+                if ret:
+                    """
+                    Special comments:
+                    computer_vision function converts frame
+                    """
+                    raw = rawFrame.copy()
+                    frame, protrusion_length = self.computer_vision(raw, backSub, initBB)
 
-                # https://stackoverflow.com/a/55468544/6622587
-                rgbImage = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                p = cv2Qt(rgbImage)
-                self.changePixmap.emit(p)
-                self.lengthFloat.emit(protrusion_length)
-                self.lengthQueue.put(protrusion_length)
+                    # https://stackoverflow.com/a/55468544/6622587
+                    rgbImage = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    p = cv2Qt(rgbImage)
+                    
+                    self.changePixmap.emit(p)
+                    self.rawFrame.emit(rawFrame)
+                    self.lengthFloat.emit(protrusion_length)
+                    self.lengthQueue.put(protrusion_length)
+                else:
+                    cap = cv2.VideoCapture(vid_path)
+                backSub = self.backSub_buffer
             else:
-                cap = cv2.VideoCapture(vid_path)
-            backSub = self.backSub_buffer
+                if self.stopped:
+                    break
+                else:
+                    pass
 
     def computer_vision(self,frame,backSub,initBB):
         """
