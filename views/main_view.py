@@ -28,7 +28,7 @@ class MainView(QMainWindow):
         self._ui.stopButton.clicked.connect(self._main_controller.stopButtonPressed)
         self._ui.stopButton.clicked.connect(self.stopButtonPressed)
 
-        self._ui.resetBBButton.clicked.connect(self._main_controller.resetBBButtonPressed)
+        self._ui.configButton.clicked.connect(self._main_controller.configButtonPressed)
         # self._ui.resetBBButton.clicked.connect(self.resetBBButtonPressed)
 
         self._ui.pauseButton.clicked.connect(self._main_controller.pauseButtonPressed)
@@ -51,10 +51,7 @@ class MainView(QMainWindow):
 
     @pyqtSlot(bool)
     def startButtonPressed(self):
-        if self.restart:
-            self.__init__()
-        else:
-            self._ui.startButton.setEnabled(False)
+        self._ui.startButton.setEnabled(False)
         self._ui.stopButton.setEnabled(True)
         self._ui.pauseButton.setEnabled(True)
 
@@ -68,6 +65,7 @@ class MainView(QMainWindow):
 
     @pyqtSlot(bool)
     def pauseButtonPressed(self):
+        self._ui.startButton.setText('CONTINUE')
         self._ui.startButton.setEnabled(True)
         self._ui.stopButton.setEnabled(True)
         self._ui.pauseButton.setEnabled(False)

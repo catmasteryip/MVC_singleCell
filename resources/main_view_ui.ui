@@ -152,9 +152,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="resetBBButton">
+      <widget class="QPushButton" name="configButton">
        <property name="text">
-        <string>Reset BB</string>
+        <string>CONFIG</string>
        </property>
       </widget>
      </item>

@@ -2,14 +2,14 @@ from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 from controllers.computer_vision import CVThread
 from controllers.pressure import PressureThread
 from controllers.calculateAg import CalculateAgThread
-from views.bbWindow import BBWindow
+from views.configWindow import ConfigWindow
 from PyQt5.QtGui import QImage
 import queue
 import threading
 
 
 class MainController(QObject):
-    
+
     def __init__(self, model):
         super().__init__()
         # Queues initiation
@@ -56,7 +56,6 @@ class MainController(QObject):
         print('stopButtonPressed')
         self._cvThread._stop()
         self._pressureThread.stop()
-        # print(f'{self._cvThread.isRunning()}')
 
     @pyqtSlot(bool)
     def pauseButtonPressed(self):
@@ -65,12 +64,12 @@ class MainController(QObject):
         self._pressureThread.pause()
 
     @pyqtSlot(bool)
-    def resetBBButtonPressed(self):
-        print('resetBBButtonPressed')
+    def configButtonPressed(self):
+        print('configButtonPressed')
         self._cvThread._stop()
         self._pressureThread.stop()
-        self.bbWindow = BBWindow(self._model.rawFrame)
-        self.bbWindow.boundingBox.connect(self.update_BB)
+        self.configWindow = ConfigWindow(self._model.rawFrame)
+        self.configWindow.boundingBox.connect(self.update_BB)
 
     @pyqtSlot(tuple)
     def update_BB(self, boundingBox):
