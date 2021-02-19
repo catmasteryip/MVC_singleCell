@@ -20,28 +20,45 @@ class CalculateAgThread(QThread):
         self.pressureQueue = pressureQueue
         self.lengthQueue = lengthQueue
         self.agQueue = agQueue
+        self.running = False
+        self.stopped = False
 
     def run(self):
+        self.running = True
         while True:
-            self.data.updatep(self.pressureQueue.get())
-            l = self.lengthQueue.get()
-            self.data.updatel(l)
+            if self.running:
+                self.data.updatep(self.pressureQueue.get())
+                l = self.lengthQueue.get()
+                self.data.updatel(l)
 
-            # with open("logs.txt", "a") as f:
-            #         f.write(f"""
-            #         l: {l}
-            #         """)
-            if (self.data.l.shape[0]) > 2:
-                if self.data.l[-2] > 0 and (math.isnan(self.data.l[-1]) or self.data.l[-1] < 1.):
-                    # with open("logs.txt", "a") as f:
-                    #     f.write(f"""
-                    #     self.data.l: {self.data.l}
-                    #     """)
-                    Ag = self.calculateAg(self.data)
-                    self.data = Data()
-                    self.agFloat.emit(Ag)
-                    self.agQueue.put(Ag)
+                # with open("logs.txt", "a") as f:
+                #         f.write(f"""
+                #         l: {l}
+                #         """)
+                if (self.data.l.shape[0]) > 2:
+                    if self.data.l[-2] > 0 and (math.isnan(self.data.l[-1]) or self.data.l[-1] < 1.):
+                        # with open("logs.txt", "a") as f:
+                        #     f.write(f"""
+                        #     self.data.l: {self.data.l}
+                        #     """)
+                        Ag = self.calculateAg(self.data)
+                        self.data = Data()
+                        self.agFloat.emit(Ag)
+                        self.agQueue.put(Ag)
+            else:
+                if self.stopped:
+                    break
+                else:
+                    pass
                     
+    def _continue(self):
+        self.running = True
+
+    def _pause(self):
+        self.running = False
+    
+    def _stop(self):
+        self.stopped = True
 
     def plotting(self):
         pass

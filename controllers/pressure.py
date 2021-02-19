@@ -8,18 +8,22 @@ from PyQt5.QtGui import QImage, QPixmap
 class PressureThread(QThread):
     pressureFloat = pyqtSignal(float)
 
-    def __init__(self, pressureQueue):
+    def __init__(self, csv_path, readRate, pressureQueue):
         super(QThread,self).__init__()
         self.pressureQueue = pressureQueue
         self.running = False
         self.stopped = False
+        self.readRate = readRate
+        self.csv_path = csv_path
 
     def run(self):
+        print('Pressure Thread triggered')
+        self.running = True
         i = 0
-        pressure_csv = read_pressure_csv('resources/pressure.csv')
+        pressure_csv = read_pressure_csv(self.csv_path)
         while True:
             if self.running:
-                time.sleep(0.1)
+                time.sleep(1/self.readRate)
                 pressure = pressure_csv[i]
                 i = i+1
                 self.pressureQueue.put(pressure)
@@ -30,14 +34,14 @@ class PressureThread(QThread):
                 else:
                     pass
 
-    def start(self):
+    def _continue(self):
         self.running = True
 
-    def stop(self):
-        self.stopped = True
-
-    def pause(self):
+    def _pause(self):
         self.running = False
+    
+    def _stop(self):
+        self.stopped = True
 
 def read_pressure_csv(filepath):
     pressure = np.genfromtxt(filepath, delimiter=',')

@@ -12,30 +12,32 @@ class CVThread(QThread):
     rawFrame = pyqtSignal(object)
     lengthFloat = pyqtSignal(float)
 
-    def __init__(self, lengthQueue, initBB = (852,553,243,18)):
+    def __init__(self, lengthQueue, vid_path, initBB, fps = 10):
         super(QThread,self).__init__()
         self.lengthQueue = lengthQueue
         self.backSub_buffer = cv2.createBackgroundSubtractorKNN(dist2Threshold=100., detectShadows=False)
         self.initBB = initBB
         self.running = False
         self.stopped = False
-        # self._lock = threading.Lock()
+        self.fps = fps
+        self.vid_path = vid_path
 
     def run(self):
         print('CVThread triggered')
-        self.cv2_imagepipe('resources/testing.avi',self.initBB)
+        self.running = True
+        self.cv2_imagepipe(vid_path=self.vid_path, initBB=self.initBB, fps=self.fps)
         self.exit()
+
+    def _continue(self):
+        self.running = True
+    
+    def _pause(self):
+        self.running = False
 
     def _stop(self):
         self.stopped = True
-    
-    def pause(self):
-        self.running = False
 
-    def _start(self):
-        self.running = True
-
-    def cv2_imagepipe(self, vid_path, initBB):
+    def cv2_imagepipe(self, vid_path, initBB, fps):
         """
         Get image from video via cv2, process frames and send results to QThread
         Args:
@@ -54,7 +56,7 @@ class CVThread(QThread):
                     computer_vision function converts frame
                     """
                     raw = rawFrame.copy()
-                    frame, protrusion_length = self.computer_vision(raw, backSub, initBB)
+                    frame, protrusion_length = self.computer_vision(raw, backSub, initBB, fps)
 
                     # https://stackoverflow.com/a/55468544/6622587
                     rgbImage = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -73,7 +75,7 @@ class CVThread(QThread):
                 else:
                     pass
 
-    def computer_vision(self,frame,backSub,initBB):
+    def computer_vision(self,frame,backSub,initBB, fps):
         """
         Measure protrusion length of the cell in a cv2 bgr image
         Args:
@@ -84,7 +86,7 @@ class CVThread(QThread):
             output(ndarray): processed cv2 bgr image
             protrusion_length(float): instanteneous protrusion length
         """
-        time.sleep(0.01)
+        time.sleep(1/fps)
         tubeX, tubeY, tubeW, tubeH = initBB
         output = frame.copy()
                 

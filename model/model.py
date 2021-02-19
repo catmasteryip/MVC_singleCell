@@ -10,6 +10,7 @@ class Model(QObject):
     pressureText = pyqtSignal(str)
     pressureFloat = pyqtSignal(float)
     agText = pyqtSignal(str)
+    configComplete = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -19,6 +20,26 @@ class Model(QObject):
         self._ag = None
         self._rawFrame = None
         self._boundingBox = None
+        self._flag = 'paused'
+        self._params = None
+
+    @property
+    def flag(self):
+        return self._flag
+
+    @flag.setter
+    def flag(self, flag):
+        if flag == 'configured':
+            self.configComplete.emit()
+        self._flag = flag
+
+    @property
+    def params(self):
+        return self._params
+
+    @params.setter
+    def params(self, params):
+        self._params = params
 
     @property
     def boundingBox(self):
@@ -27,7 +48,7 @@ class Model(QObject):
     @boundingBox.setter
     def boundingBox(self, bb):
         self._boundingBox = bb
-        print(self._boundingBox)
+        # print(self._boundingBox)
         # self.boundingBox.emit(tuple)
 
     @property

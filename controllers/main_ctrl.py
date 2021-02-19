@@ -2,7 +2,7 @@ from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 from controllers.computer_vision import CVThread
 from controllers.pressure import PressureThread
 from controllers.calculateAg import CalculateAgThread
-from views.configWindow import ConfigWindow
+
 from PyQt5.QtGui import QImage
 import queue
 import threading
@@ -12,64 +12,90 @@ class MainController(QObject):
 
     def __init__(self, model):
         super().__init__()
+
+        # Model initiation
+        self._model = model
+
+    def initSequence(self):
+        # retrieve model params as defaults to init threads
+        params = self._model.params
+
         # Queues initiation
         self.lengthQueue = queue.Queue()
         self.pressureQueue = queue.Queue()
         self.agQueue = queue.Queue()
 
-
-        # Model initiation
-        self._model = model
-
         # CVThread initiation
-        self._cvThread = CVThread(lengthQueue = self.lengthQueue)
+        bb = eval(params['ROI'][0])
+        self._cvThread = CVThread(lengthQueue = self.lengthQueue, vid_path=params['Video Path'][0], fps = params['Video FPS'][0], initBB=bb)
         self._cvThread.changePixmap.connect(self.update_frame)
         self._cvThread.lengthFloat.connect(self.update_length)
         self._cvThread.rawFrame.connect(self.update_rawFrame)
 
         # PressureThread initiation
-        self._pressureThread = PressureThread(pressureQueue = self.pressureQueue)
+        self._pressureThread = PressureThread(csv_path=params['Pressure Log Path'][0],readRate=params['Pressure Read Rate'][0], 
+        pressureQueue = self.pressureQueue)
         self._pressureThread.pressureFloat.connect(self.update_pressure)
 
         # ElasticityThread initiation
         self._calculateAgThread = CalculateAgThread(lengthQueue = self.lengthQueue,
                                                  pressureQueue = self.pressureQueue,
-                                                 length_ratio = 3.46,
+                                                 length_ratio = params['pixel to 1e-6m'][0],
                                                  agQueue = self.agQueue)
         self._calculateAgThread.agFloat.connect(self.update_ag)
 
-        self._cvThread.start()
-        self._pressureThread.start()
-        self._calculateAgThread.start()
-
-        # controller-subcontroller connections
+    @pyqtSlot(object)
+    def parameterSaved(self, params):
+        # update model params
+        self._model.params = params
+        self.initSequence()
+        
+    @pyqtSlot()
+    def configurationComplete(self):
+        self._model.flag = 'configured'
 
     @pyqtSlot(bool)
     def startButtonPressed(self):
-        print('startButtonPressed')
-        self._cvThread._start()
-        self._pressureThread.start()
-        # print(f'{self._cvThread.isRunning()}')
+        if self._model.flag == 'configured':
+            # start
+            self._cvThread.start()
+            self._pressureThread.start()
+            self._calculateAgThread.start()
+        elif self._model.flag == 'paused':
+            # continue 
+            self._cvThread._continue()
+            self._pressureThread._continue()
+            self._calculateAgThread._continue()
+            self._model.flag = 'started'
+        elif self._model.flag == 'stopped':
+            print('mainCon: restarting')
+            # restart
+            self.initSequence()
+            self._cvThread.start()
+            self._pressureThread.start()
+            self._calculateAgThread.start()
+            self._model.flag = 'started'
+
+    @pyqtSlot(bool)
+    def pauseButtonPressed(self):
+        print('pauseButtonPressed')
+        self._cvThread._pause()
+        self._pressureThread._pause()
+        self._calculateAgThread._pause()
+        self._model.flag = 'paused'
 
     @pyqtSlot(bool)
     def stopButtonPressed(self):
         print('stopButtonPressed')
         self._cvThread._stop()
-        self._pressureThread.stop()
-
-    @pyqtSlot(bool)
-    def pauseButtonPressed(self):
-        print('pauseButtonPressed')
-        self._cvThread.pause()
-        self._pressureThread.pause()
+        self._pressureThread._stop()
+        self._calculateAgThread._stop()
+        self._model.flag = 'stopped'
 
     @pyqtSlot(bool)
     def configButtonPressed(self):
-        print('configButtonPressed')
-        self._cvThread._stop()
-        self._pressureThread.stop()
-        self.configWindow = ConfigWindow(self._model.rawFrame)
-        self.configWindow.boundingBox.connect(self.update_BB)
+        pass
+        
 
     @pyqtSlot(tuple)
     def update_BB(self, boundingBox):
