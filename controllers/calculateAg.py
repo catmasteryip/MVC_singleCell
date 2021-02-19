@@ -58,6 +58,7 @@ class CalculateAgThread(QThread):
         self.running = False
     
     def _stop(self):
+        self.running = False
         self.stopped = True
 
     def plotting(self):

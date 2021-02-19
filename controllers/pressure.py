@@ -41,6 +41,7 @@ class PressureThread(QThread):
         self.running = False
     
     def _stop(self):
+        self.running = False
         self.stopped = True
 
 def read_pressure_csv(filepath):
