@@ -116,7 +116,7 @@
       <widget class="RealTimePlotWidget" name="lengthGraphWidget" native="true"/>
      </item>
      <item row="1" column="0">
-      <widget class="RealTimePlotWidget" name="graphWidget" native="true"/>
+      <widget class="RealTimePlotWidget" name="pressureGraphWidget" native="true"/>
      </item>
     </layout>
    </widget>

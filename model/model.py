@@ -11,6 +11,7 @@ class Model(QObject):
     pressureFloat = pyqtSignal(float)
     agText = pyqtSignal(str)
     configComplete = pyqtSignal()
+    restarting = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -31,6 +32,8 @@ class Model(QObject):
     def flag(self, flag):
         if flag == 'configured':
             self.configComplete.emit()
+        elif flag == 'started':
+            self.restarting.emit()
         self._flag = flag
 
     @property

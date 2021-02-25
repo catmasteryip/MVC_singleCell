@@ -57,7 +57,8 @@ class CVThread(QThread):
                     computer_vision function converts frame
                     """
                     raw = rawFrame.copy()
-                    frame, protrusion_length = self.computer_vision(raw, backSub, initBB, fps)
+                    time.sleep(1/fps)
+                    frame, protrusion_length = self.computer_vision(raw, backSub, initBB)
 
                     # https://stackoverflow.com/a/55468544/6622587
                     rgbImage = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -76,7 +77,7 @@ class CVThread(QThread):
                 else:
                     pass
 
-    def computer_vision(self,frame,backSub,initBB, fps):
+    def computer_vision(self,frame,backSub,initBB):
         """
         Measure protrusion length of the cell in a cv2 bgr image
         Args:
@@ -87,7 +88,7 @@ class CVThread(QThread):
             output(ndarray): processed cv2 bgr image
             protrusion_length(float): instanteneous protrusion length
         """
-        time.sleep(1/fps)
+
         tubeX, tubeY, tubeW, tubeH = initBB
         output = frame.copy()
                 

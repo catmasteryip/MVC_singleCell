@@ -2,6 +2,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSlot
 from PyQt5 import QtWidgets
 from pyqtgraph import PlotWidget
+from pyqtgraph import mkPen
 
 class RealTimePlotWidget(PlotWidget):
     def __init__(self, parent=None, x_len=200, y_range=[-0.5, 0.5]):
@@ -10,9 +11,11 @@ class RealTimePlotWidget(PlotWidget):
         self._x_len_ = x_len
         self._y_range_ = y_range
 
-        # Store two lists _x_ and _y_
+        # Store three lists 
         self._x_ = list(range(0, self._x_len_))
-        self._y_ = [0] * self._x_len_
+        self._y1_ = [0] * self._x_len_
+        self._y2_ = [0] * self._x_len_
+        # self.addLine(x=, y=None, pen=mkPen('r',width=3))
         self.curve = self.plot(pen='y')
     
     @pyqtSlot(float)

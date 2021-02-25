@@ -17,12 +17,24 @@ class MainView(QMainWindow):
         self._ui.setupUi(self)
         self.restart=False
 
+        # default ui values
+        # length plot
+        self._ui.lengthGraphWidget.setTitle('protrusion length')
+        # set axis label
+        self._ui.lengthGraphWidget.setLabel('bottom','data point #')
+        self._ui.lengthGraphWidget.setLabel('left','protrusion length (px)')
+
+        self._ui.pressureGraphWidget.setTitle('pressure')
+        # set axis label
+        self._ui.pressureGraphWidget.setLabel('bottom','data point #')
+        self._ui.pressureGraphWidget.setLabel('left','pressure (inH2O)')
+
         # control ui elements
         self._ui.startButton.clicked.connect(self.startButtonPressed)
         self._ui.stopButton.clicked.connect(self.stopButtonPressed)
         self._ui.pauseButton.clicked.connect(self.pauseButtonPressed)
 
-        # connect ui elements to model
+        # connect ui elements to view and controller functions
 
         self._ui.startButton.clicked.connect(self._main_controller.startButtonPressed)
         self._ui.startButton.clicked.connect(self.startButtonPressed)
@@ -42,9 +54,10 @@ class MainView(QMainWindow):
         self._model.lengthText.connect(self.setLength)
         self._model.pressureText.connect(self.setPressure)
         self._model.agText.connect(self.setAg)
-        self._model.pressureFloat.connect(self._ui.graphWidget.update_plot)
+        self._model.pressureFloat.connect(self._ui.pressureGraphWidget.update_plot)
         self._model.lengthFloat.connect(self._ui.lengthGraphWidget.update_plot)
         self._model.configComplete.connect(self.configComplete)
+        self._model.restarting.connect(self.restarting)
 
         
         # set a default values to controller
@@ -57,6 +70,12 @@ class MainView(QMainWindow):
         self.configWindow = ConfigWindow()
         self.configWindow.param_tree.parameters.connect(self._main_controller.parameterSaved)
         self.configWindow.closing.connect(self._main_controller.configurationComplete)
+
+    @pyqtSlot()
+    def restarting(self):
+        print('mainView: restarting')
+        self._ui.lengthGraphWidget.clear_plot()
+        self._ui.pressureGraphWidget.clear_plot()
 
 
     @pyqtSlot(bool)
@@ -101,6 +120,8 @@ class MainView(QMainWindow):
         self._ui.stopButton.setEnabled(False)
         self._ui.pauseButton.setEnabled(False)
         self._ui.configButton.setEnabled(True)
+        self._ui.lengthGraphWidget.clear_plot()
+        self._ui.pressureGraphWidget.clear_plot()
 
     @pyqtSlot(object)
     def setImage(self, image):
