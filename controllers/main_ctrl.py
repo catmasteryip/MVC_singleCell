@@ -1,3 +1,4 @@
+# MVC pattern-controller
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 from controllers.computer_vision import CVThread
 from controllers.pressure import PressureThread
@@ -6,6 +7,8 @@ from controllers.calculateAg import CalculateAgThread
 from PyQt5.QtGui import QImage
 import queue
 import threading
+import os
+import sys
 
 
 class MainController(QObject):
@@ -25,15 +28,23 @@ class MainController(QObject):
         self.pressureQueue = queue.Queue()
         self.agQueue = queue.Queue()
 
+        # Change video paths and pressure .csv paths
+        # get path in executable
+        # cwd = sys.executable.rsplit('/',1)[0]
+        # get path in raw python code
+        cwd = os.getcwd()
+        vid_path = os.path.join(cwd,params['Video Path'][0])
+        pressure_path = os.path.join(cwd,params['Pressure Log Path'][0])
+
         # CVThread initiation
         bb = eval(params['ROI'][0])
-        self._cvThread = CVThread(lengthQueue = self.lengthQueue, vid_path=params['Video Path'][0], fps = params['Video FPS'][0], initBB=bb)
+        self._cvThread = CVThread(lengthQueue = self.lengthQueue, vid_path=vid_path, fps = params['Video FPS'][0], initBB=bb)
         self._cvThread.changePixmap.connect(self.update_frame)
         self._cvThread.lengthFloat.connect(self.update_length)
         self._cvThread.rawFrame.connect(self.update_rawFrame)
 
         # PressureThread initiation
-        self._pressureThread = PressureThread(csv_path=params['Pressure Log Path'][0],readRate=params['Pressure Read Rate'][0], 
+        self._pressureThread = PressureThread(csv_path=pressure_path,readRate=params['Pressure Read Rate'][0], 
         pressureQueue = self.pressureQueue)
         self._pressureThread.pressureFloat.connect(self.update_pressure)
 

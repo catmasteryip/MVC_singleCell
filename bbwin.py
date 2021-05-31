@@ -1,11 +1,8 @@
+# window for bounding box selection
 import pyqtgraph as pg
 from PyQt5.QtCore import pyqtSignal
 import PyQt5.QtGui as QtGui
 import numpy as np
-import cv2
-
-
-
 
 class BBWindow(QtGui.QWidget):
     boundingBox = pyqtSignal(tuple)

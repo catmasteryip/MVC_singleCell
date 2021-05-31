@@ -1,3 +1,4 @@
+# MVC pattern-view
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5 import QtCore

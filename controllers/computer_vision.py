@@ -1,3 +1,5 @@
+# most important thread of all, computer vision thread which reads vids (for offline model),
+# and apply CV techniques to measure the size of the cell in constriction channel
 import cv2
 import os
 import numpy as np

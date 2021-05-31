@@ -1,3 +1,5 @@
+# MVC pattern-another view
+# complicated 2-line plots for curve fitting of protrusion length
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSlot
 from PyQt5 import QtWidgets

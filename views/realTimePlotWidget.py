@@ -1,3 +1,4 @@
+# simple 1-line plot widget class
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSlot
 from PyQt5 import QtWidgets
@@ -20,8 +21,10 @@ class RealTimePlotWidget(PlotWidget):
         y = 0
         if dataFloat is not None:
             y = dataFloat
-        self._y_.append(y)                                  # Add new datapoint
-        self._y_ = self._y_[-self._x_len_:]                 # Truncate list y
+        # Add new datapoint
+        self._y_.append(y)          
+        # Truncate list y                        
+        self._y_ = self._y_[-self._x_len_:]                 
         self.curve.setData(self._x_,self._y_)
 
     def clear_plot(self):
