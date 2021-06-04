@@ -11,6 +11,7 @@ class Model(QObject):
     pressureText = pyqtSignal(str)
     pressureFloat = pyqtSignal(float)
     agText = pyqtSignal(str)
+    curveFittingPacket = pyqtSignal(object)
     configComplete = pyqtSignal()
     restarting = pyqtSignal()
 
@@ -20,10 +21,20 @@ class Model(QObject):
         self._length = None
         self._pressure = None
         self._ag = None
+        self._curveFitting = None
         self._rawFrame = None
         self._boundingBox = None
         self._flag = 'paused'
         self._params = None
+
+    @property
+    def curveFitting(self):
+        return self._curveFitting
+
+    @curveFitting.setter
+    def curveFitting(self, curveFitting):
+        print("model: ", curveFitting)
+        self.curveFittingPacket.emit(curveFitting)
 
     @property
     def flag(self):
@@ -101,5 +112,3 @@ class Model(QObject):
     def ag(self, ag):
         self._ag = ag
         self.agText.emit(f'{ag}')
-
-    

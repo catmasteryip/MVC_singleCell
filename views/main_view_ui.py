@@ -54,7 +54,7 @@ class Ui_MainWindow(object):
         self.label_4.setObjectName("label_4")
         self.gridLayout.addWidget(self.label_4, 2, 2, 1, 1)
         self.gridLayoutWidget_2 = QtWidgets.QWidget(self.centralwidget)
-        self.gridLayoutWidget_2.setGeometry(QtCore.QRect(420, 60, 301, 281))
+        self.gridLayoutWidget_2.setGeometry(QtCore.QRect(420, 60, 301, 411))
         self.gridLayoutWidget_2.setObjectName("gridLayoutWidget_2")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.gridLayoutWidget_2)
         self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -65,6 +65,9 @@ class Ui_MainWindow(object):
         self.pressureGraphWidget = RealTimePlotWidget(self.gridLayoutWidget_2)
         self.pressureGraphWidget.setObjectName("pressureGraphWidget")
         self.gridLayout_2.addWidget(self.pressureGraphWidget, 1, 0, 1, 1)
+        self.curveFittingGraphWidget = TwoLineRealTimePlotWidget(self.gridLayoutWidget_2)
+        self.curveFittingGraphWidget.setObjectName("curveFittingGraphWidget")
+        self.gridLayout_2.addWidget(self.curveFittingGraphWidget, 3, 0, 1, 1)
         self.horizontalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.horizontalLayoutWidget.setGeometry(QtCore.QRect(20, 340, 390, 41))
         self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
@@ -113,3 +116,14 @@ class Ui_MainWindow(object):
         self.stopButton.setText(_translate("MainWindow", "STOP"))
         self.configButton.setText(_translate("MainWindow", "CONFIG"))
 from views.realTimePlotWidget import RealTimePlotWidget
+from views.twoLineRealTimePlotWidget import TwoLineRealTimePlotWidget
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec_())

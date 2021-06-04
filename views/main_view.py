@@ -16,19 +16,25 @@ class MainView(QMainWindow):
         self._main_controller = main_controller
         self._ui = Ui_MainWindow()
         self._ui.setupUi(self)
-        self.restart=False
+        self.restart = False
 
         # default ui values
         # length plot
         self._ui.lengthGraphWidget.setTitle('protrusion length')
         # set axis label
-        self._ui.lengthGraphWidget.setLabel('bottom','data point #')
-        self._ui.lengthGraphWidget.setLabel('left','protrusion length (px)')
+        self._ui.lengthGraphWidget.setLabel('bottom', 'data point #')
+        self._ui.lengthGraphWidget.setLabel('left', 'protrusion length (px)')
 
         self._ui.pressureGraphWidget.setTitle('pressure')
         # set axis label
-        self._ui.pressureGraphWidget.setLabel('bottom','data point #')
-        self._ui.pressureGraphWidget.setLabel('left','pressure (inH2O)')
+        self._ui.pressureGraphWidget.setLabel('bottom', 'data point #')
+        self._ui.pressureGraphWidget.setLabel('left', 'pressure (inH2O)')
+
+        self._ui.curveFittingGraphWidget.setTitle('power law curve')
+        # set axis label
+        self._ui.curveFittingGraphWidget.setLabel('bottom', 'data point #')
+        self._ui.curveFittingGraphWidget.setLabel(
+            'left', 'protrusion length (px)')
 
         # control ui elements
         self._ui.startButton.clicked.connect(self.startButtonPressed)
@@ -37,30 +43,36 @@ class MainView(QMainWindow):
 
         # connect ui elements to view and controller functions
 
-        self._ui.startButton.clicked.connect(self._main_controller.startButtonPressed)
+        self._ui.startButton.clicked.connect(
+            self._main_controller.startButtonPressed)
         self._ui.startButton.clicked.connect(self.startButtonPressed)
 
-        self._ui.pauseButton.clicked.connect(self._main_controller.pauseButtonPressed)
+        self._ui.pauseButton.clicked.connect(
+            self._main_controller.pauseButtonPressed)
         self._ui.pauseButton.clicked.connect(self.pauseButtonPressed)
 
-        self._ui.stopButton.clicked.connect(self._main_controller.stopButtonPressed)
+        self._ui.stopButton.clicked.connect(
+            self._main_controller.stopButtonPressed)
         self._ui.stopButton.clicked.connect(self.stopButtonPressed)
 
-        self._ui.configButton.clicked.connect(self._main_controller.configButtonPressed)
+        self._ui.configButton.clicked.connect(
+            self._main_controller.configButtonPressed)
         self._ui.configButton.clicked.connect(self.configButtonPressed)
-
 
         # listen for model event signals, i.e. link this view to model
         self._model.frameSignal.connect(self.setImage)
         self._model.lengthText.connect(self.setLength)
         self._model.pressureText.connect(self.setPressure)
         self._model.agText.connect(self.setAg)
-        self._model.pressureFloat.connect(self._ui.pressureGraphWidget.update_plot)
+        self._model.pressureFloat.connect(
+            self._ui.pressureGraphWidget.update_plot)
         self._model.lengthFloat.connect(self._ui.lengthGraphWidget.update_plot)
+        self._model.curveFittingPacket.connect(
+            self._ui.curveFittingGraphWidget.update_plot)
+
         self._model.configComplete.connect(self.configComplete)
         self._model.restarting.connect(self.restarting)
 
-        
         # set a default values to controller
         self._ui.startButton.setEnabled(False)
         self._ui.stopButton.setEnabled(False)
@@ -69,15 +81,16 @@ class MainView(QMainWindow):
 
         # starting sequence
         self.configWindow = ConfigWindow()
-        self.configWindow.param_tree.parameters.connect(self._main_controller.parameterSaved)
-        self.configWindow.closing.connect(self._main_controller.configurationComplete)
+        self.configWindow.param_tree.parameters.connect(
+            self._main_controller.parameterSaved)
+        self.configWindow.closing.connect(
+            self._main_controller.configurationComplete)
 
     @pyqtSlot()
     def restarting(self):
         print('mainView: restarting')
         self._ui.lengthGraphWidget.clear_plot()
         self._ui.pressureGraphWidget.clear_plot()
-
 
     @pyqtSlot(bool)
     def startButtonPressed(self):
@@ -111,8 +124,10 @@ class MainView(QMainWindow):
         self._ui.configButton.setEnabled(False)
 
         self.configWindow = ConfigWindow(self._model.rawFrame)
-        self.configWindow.param_tree.parameters.connect(self._main_controller.parameterSaved)
-        self.configWindow.closing.connect(self._main_controller.configurationComplete)
+        self.configWindow.param_tree.parameters.connect(
+            self._main_controller.parameterSaved)
+        self.configWindow.closing.connect(
+            self._main_controller.configurationComplete)
 
     @pyqtSlot()
     def configComplete(self):
@@ -128,7 +143,8 @@ class MainView(QMainWindow):
     def setImage(self, image):
         w = self._ui.imageLabel.width()
         h = self._ui.imageLabel.height()
-        self._ui.imageLabel.setPixmap(QPixmap.fromImage(image).scaled(w,h,QtCore.Qt.KeepAspectRatio))
+        self._ui.imageLabel.setPixmap(QPixmap.fromImage(
+            image).scaled(w, h, QtCore.Qt.KeepAspectRatio))
 
     @pyqtSlot(str)
     def setLength(self, lengthText):

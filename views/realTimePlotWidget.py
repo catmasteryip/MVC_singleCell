@@ -4,6 +4,7 @@ from PyQt5.QtCore import pyqtSlot
 from PyQt5 import QtWidgets
 from pyqtgraph import PlotWidget
 
+
 class RealTimePlotWidget(PlotWidget):
     def __init__(self, parent=None, x_len=200, y_range=[-0.5, 0.5]):
         PlotWidget.__init__(self, parent)
@@ -15,18 +16,18 @@ class RealTimePlotWidget(PlotWidget):
         self._x_ = list(range(0, self._x_len_))
         self._y_ = [0] * self._x_len_
         self.curve = self.plot(pen='y')
-    
+
     @pyqtSlot(float)
     def update_plot(self, dataFloat):
         y = 0
         if dataFloat is not None:
             y = dataFloat
         # Add new datapoint
-        self._y_.append(y)          
-        # Truncate list y                        
-        self._y_ = self._y_[-self._x_len_:]                 
-        self.curve.setData(self._x_,self._y_)
+        self._y_.append(y)
+        # Truncate list y
+        self._y_ = self._y_[-self._x_len_:]
+        self.curve.setData(self._x_, self._y_)
 
     def clear_plot(self):
         self._y_ = [0] * self._x_len_
-        self.curve.setData(self._x_,self._y_)
+        self.curve.setData(self._x_, self._y_)

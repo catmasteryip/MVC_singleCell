@@ -1,0 +1,4 @@
+Done 1. Debug: do not clear graphs after pressing pause btn
+Done 2. New Feature: Power law curve graph
+3. Debug: Set protrusion length NA == gaps
+4. New features: Styles

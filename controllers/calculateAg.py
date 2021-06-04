@@ -1,4 +1,4 @@
-# thread for Ag calculation 
+# thread for Ag calculation
 import os
 import numpy as np
 import math
@@ -10,8 +10,10 @@ from moviepy.video.io.bindings import mplfig_to_npimage
 from PyQt5.QtCore import QThread, Qt, pyqtSignal, pyqtSlot, QObject
 from PyQt5.QtGui import QImage, QPixmap
 
+
 class CalculateAgThread(QThread):
     agFloat = pyqtSignal(float)
+    curveFittingPacket = pyqtSignal(object)
 
     def __init__(self, length_ratio, pressureQueue, lengthQueue, agQueue):
         super(QThread, self).__init__()
@@ -42,22 +44,32 @@ class CalculateAgThread(QThread):
                         #     f.write(f"""
                         #     self.data.l: {self.data.l}
                         #     """)
-                        Ag = self.calculateAg(self.data)
-                        self.data = Data()
-                        self.agFloat.emit(Ag)
-                        self.agQueue.put(Ag)
+                        results = self.calculateAg(self.data)
+                        # Ag = self.calculateAg(self.data)
+                        if results is not math.nan:
+                            print("calculateAg results:", results)
+                            Ag = results["Ag"]
+                            curveFittingPacket = results["curveFittingPacket"]
+
+                            self.data = Data()
+                            self.agQueue.put(Ag)
+
+                            # emit pyqtSignals
+                            self.agFloat.emit(Ag)
+                            self.curveFittingPacket.emit(curveFittingPacket)
+                            # self.curveFittingPacket.emit(math.nan)
             else:
                 if self.stopped:
                     break
                 else:
                     pass
-                    
+
     def _continue(self):
         self.running = True
 
     def _pause(self):
         self.running = False
-    
+
     def _stop(self):
         self.running = False
         self.stopped = True
@@ -65,16 +77,15 @@ class CalculateAgThread(QThread):
     def plotting(self):
         pass
 
-    def calculateAg(self,data):
+    def calculateAg(self, data):
         try:
-            l = data.l 
-            ltime = data.ltime 
-            p = data.p 
-            ptime = data.ptime 
+            l = data.l
+            ltime = data.ltime
+            p = data.p
+            ptime = data.ptime
             length_ratio = self.length_ratio
 
             l = l/length_ratio
-            
 
             # length data cleaning
             nan_indexes = np.argwhere(np.isnan(l))
@@ -88,7 +99,7 @@ class CalculateAgThread(QThread):
             ltime_adj = ltime - ltime[0]
 
             # fitting 3rd order polynomial
-            
+
             # z = np.polyfit(x=x, y=y, deg=3)
             # poly3 = np.poly1d(z)
             # xnew = np.linspace(0, max(x), num=50, endpoint=True)
@@ -108,13 +119,13 @@ class CalculateAgThread(QThread):
             # x_cropped = x[x<xnew[cutoff]]
             # x_cropped = x_cropped[1:]
 
-            # take only first 10 datapoints
+            # take only first 20 datapoints
             x = ltime_adj
             y = l
-            y_cropped = y[1:10]
-            x_cropped = x[1:10]
-            
-            alpha,log_K = np.polyfit(np.log(x_cropped), np.log(y_cropped), 1)
+            y_cropped = y[1:20]
+            x_cropped = x[1:20]
+
+            alpha, log_K = np.polyfit(np.log(x_cropped), np.log(y_cropped), 1)
             K = np.exp(log_K)
             l_fit = K*(x_cropped**alpha)
 
@@ -122,40 +133,56 @@ class CalculateAgThread(QThread):
             tenter = min(ltime)
             tentry = max(ltime_adj)
 
-            p = p[ptime>tenter]
-            ptime = ptime[ptime>tenter]
+            p = p[ptime > tenter]
+            ptime = ptime[ptime > tenter]
             ptime = ptime-ptime[0]
-            
-            Ag = float(math.nan)      
-            p_avg = np.trapz(x=ptime,y=p)*249.08/tentry
+
+            Ag = float(math.nan)
+            p_avg = np.trapz(x=ptime, y=p)*249.08/tentry
             Aj = K/1.848/p_avg
             Ag = 1/Aj/math.gamma(1+alpha)
             if Ag is None:
                 Ag = float(math.nan)
 
-            return round(Ag,3)
+            # organize the 3 lists for curve fitting plot
+            curveFittingPacket = DataCurveFitting()
+            curveFittingPacket.x = x
+            curveFittingPacket.y = y
+            curveFittingPacket.yfit = len(x) * [math.nan]
+            curveFittingPacket.yfit[0:len(l_fit)] = l_fit
+
+            results = {
+                "Ag": round(Ag, 3),
+                "curveFittingPacket": curveFittingPacket
+            }
+
+            return results
 
         except:
             exc_info = sys.exc_info()
             traceback.print_exception(*exc_info)
             # error list: np.linalg.LinAlgError
             with open("logs.txt", "a") as f:
-                f.write(f"""
-                x: {x}
-                y: {y}
-                x_cropped: {x_cropped}
-                y_cropped: {y_cropped}
-                exc_info: {exc_info}
-                """)
+                f.write(
+                    #     f"""
+                    # x: {x}
+                    # y: {y}
+                    # x_cropped: {x_cropped}
+                    # y_cropped: {y_cropped}
+                    # exc_info: {exc_info}
+                    # """
+                )
                 # {Ag} {Aj} {alpha} {p_avg}
                 f.close()
 
-    def cv2Qt(self, rgbImage):
-        h, w, ch = rgbImage.shape
-        bytesPerLine = ch * w
-        convertToQtFormat = QImage(rgbImage.data, w, h, bytesPerLine, QImage.Format_RGB888)
-        p = convertToQtFormat.scaled(640, 480, Qt.KeepAspectRatio)
-        return p
+    # def cv2Qt(self, rgbImage):
+    #     h, w, ch = rgbImage.shape
+    #     bytesPerLine = ch * w
+    #     convertToQtFormat = QImage(
+    #         rgbImage.data, w, h, bytesPerLine, QImage.Format_RGB888)
+    #     p = convertToQtFormat.scaled(640, 480, Qt.KeepAspectRatio)
+    #     return p
+
 
 class Data():
     def __init__(self):
@@ -164,10 +191,17 @@ class Data():
         self.ltime = np.array([])
         self.l = np.array([])
 
-    def updatep(self,pressure):
-        self.p = np.append(self.p,pressure)
-        self.ptime = np.append(self.ptime,time.time())
+    def updatep(self, pressure):
+        self.p = np.append(self.p, pressure)
+        self.ptime = np.append(self.ptime, time.time())
 
-    def updatel(self,length):
-        self.l = np.append(self.l,length)
-        self.ltime = np.append(self.ltime,time.time())
+    def updatel(self, length):
+        self.l = np.append(self.l, length)
+        self.ltime = np.append(self.ltime, time.time())
+
+
+class DataCurveFitting():
+    def __init__(self):
+        self.x = np.array([])
+        self.y = np.array([])
+        self.yfit = np.array([])

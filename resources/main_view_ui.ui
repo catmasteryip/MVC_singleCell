@@ -108,7 +108,7 @@
       <x>420</x>
       <y>60</y>
       <width>301</width>
-      <height>281</height>
+      <height>411</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_2">
@@ -117,6 +117,9 @@
      </item>
      <item row="1" column="0">
       <widget class="RealTimePlotWidget" name="pressureGraphWidget" native="true"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="TwoLineRealTimePlotWidget" name="curveFittingGraphWidget" native="true"/>
      </item>
     </layout>
    </widget>
@@ -178,6 +181,12 @@
    <class>RealTimePlotWidget</class>
    <extends>QWidget</extends>
    <header>views.realTimePlotWidget</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TwoLineRealTimePlotWidget</class>
+   <extends>QWidget</extends>
+   <header>views.twoLineRealTimePlotWidget</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

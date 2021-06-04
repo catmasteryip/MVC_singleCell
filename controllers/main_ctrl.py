@@ -33,34 +33,37 @@ class MainController(QObject):
         # cwd = sys.executable.rsplit('/',1)[0]
         # get path in raw python code
         cwd = os.getcwd()
-        vid_path = os.path.join(cwd,params['Video Path'][0])
-        pressure_path = os.path.join(cwd,params['Pressure Log Path'][0])
+        vid_path = os.path.join(cwd, params['Video Path'][0])
+        pressure_path = os.path.join(cwd, params['Pressure Log Path'][0])
 
         # CVThread initiation
         bb = eval(params['ROI'][0])
-        self._cvThread = CVThread(lengthQueue = self.lengthQueue, vid_path=vid_path, fps = params['Video FPS'][0], initBB=bb)
+        self._cvThread = CVThread(lengthQueue=self.lengthQueue,
+                                  vid_path=vid_path, fps=params['Video FPS'][0], initBB=bb)
         self._cvThread.changePixmap.connect(self.update_frame)
         self._cvThread.lengthFloat.connect(self.update_length)
         self._cvThread.rawFrame.connect(self.update_rawFrame)
 
         # PressureThread initiation
-        self._pressureThread = PressureThread(csv_path=pressure_path,readRate=params['Pressure Read Rate'][0], 
-        pressureQueue = self.pressureQueue)
+        self._pressureThread = PressureThread(csv_path=pressure_path, readRate=params['Pressure Read Rate'][0],
+                                              pressureQueue=self.pressureQueue)
         self._pressureThread.pressureFloat.connect(self.update_pressure)
 
         # ElasticityThread initiation
-        self._calculateAgThread = CalculateAgThread(lengthQueue = self.lengthQueue,
-                                                 pressureQueue = self.pressureQueue,
-                                                 length_ratio = params['pixel to 1e-6m'][0],
-                                                 agQueue = self.agQueue)
+        self._calculateAgThread = CalculateAgThread(lengthQueue=self.lengthQueue,
+                                                    pressureQueue=self.pressureQueue,
+                                                    length_ratio=params['pixel to 1e-6m'][0],
+                                                    agQueue=self.agQueue)
         self._calculateAgThread.agFloat.connect(self.update_ag)
+        self._calculateAgThread.curveFittingPacket.connect(
+            self.updateCurveFitting)
 
     @pyqtSlot(object)
     def parameterSaved(self, params):
         # update model params
         self._model.params = params
         self.initSequence()
-        
+
     @pyqtSlot()
     def configurationComplete(self):
         self._model.flag = 'configured'
@@ -73,13 +76,13 @@ class MainController(QObject):
             self._pressureThread.start()
             self._calculateAgThread.start()
         elif self._model.flag == 'paused':
-            # continue 
+            # continue
             self._cvThread._continue()
             self._pressureThread._continue()
             self._calculateAgThread._continue()
-            self._model.flag = 'started'
+            self._model.flag = 'continued'
         elif self._model.flag == 'stopped':
-            print('mainCon: restarting')
+            print('mainCon: Can be restarted')
             # restart
             self.initSequence()
             self._cvThread.start()
@@ -106,7 +109,6 @@ class MainController(QObject):
     @pyqtSlot(bool)
     def configButtonPressed(self):
         pass
-        
 
     @pyqtSlot(tuple)
     def update_BB(self, boundingBox):
@@ -131,3 +133,8 @@ class MainController(QObject):
     @pyqtSlot(float)
     def update_ag(self, agFloat):
         self._model.ag = agFloat
+
+    @pyqtSlot(object)
+    def updateCurveFitting(self, curveFittingPacket):
+        print("mainCon curveFittingPacket:", curveFittingPacket)
+        self._model.curveFitting = curveFittingPacket
