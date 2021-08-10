@@ -127,11 +127,12 @@ class Parameter_Tree(ParameterTree):
         self.params = [
                     {'name': 'Video FPS', 'type': 'float', 'value': 10, 'step': 0.01},
                     {'name': 'Video Path', 'type': 'str', 'value': "resources/testing.avi"},
+                    # {'name': 'Video Path', 'type': 'str', 'value': "resources/350-390.avi"},
                     {'name': 'Pressure Read Rate', 'float': 'float', 'value': 5, 'step': 0.01},
                     {'name': 'Pressure Log Path', 'type': 'str', 'value': "resources/pressure.csv"},
                     {'name': 'Pressure Log Start', 'type': 'float', 'value': 0},
                     {'name': 'pixel to 1e-6m', 'type': 'float', 'value': 3.46},
-                    {'name': 'ROI', 'type': 'str', 'value': '(852,553,243,18)','readonly': True},
+                    {'name': 'ROI', 'type': 'str', 'value': '(852,500,243,100)','readonly': True},
                     {'name': 'Save State', 'type': 'action'},
                     {'name': 'Restore State', 'type': 'action'}
                 ]
@@ -196,6 +197,7 @@ class Parameter_Tree(ParameterTree):
     def updateBB(self, roi):
         roi = str(roi)
         self.p.param('ROI').setValue(roi)
+        print(roi)
 
 from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtCore import QEvent
