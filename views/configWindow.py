@@ -7,13 +7,14 @@ Pop-up window for user to select BB and config
 import pyqtgraph as pg
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 import PyQt5.QtGui as QtGui
+import PyQt5.QtWidgets as QtWidgets
 import numpy as np
 import cv2
 
 
 
 
-class BBWindow(QtGui.QWidget):
+class BBWindow(QtWidgets.QWidget):
     boundingBox = pyqtSignal(tuple)
 
     def __init__(self, data, parent=None):
@@ -131,7 +132,7 @@ class Parameter_Tree(ParameterTree):
                     {'name': 'Pressure Log Path', 'type': 'str', 'value': "resources/pressure.csv"},
                     {'name': 'Pressure Log Start', 'type': 'float', 'value': 0},
                     {'name': 'pixel to 1e-6m', 'type': 'float', 'value': 3.46},
-                    {'name': 'ROI', 'type': 'str', 'value': '(852,553,243,18)','readonly': True},
+                    {'name': 'ROI', 'type': 'str', 'value': '(852,528,243,68)','readonly': True},
                     {'name': 'Save State', 'type': 'action'},
                     {'name': 'Restore State', 'type': 'action'}
                 ]

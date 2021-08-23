@@ -5,7 +5,7 @@ import math
 import time
 import sys
 import traceback
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from moviepy.video.io.bindings import mplfig_to_npimage
 from PyQt5.QtCore import QThread, Qt, pyqtSignal, pyqtSlot, QObject
 from PyQt5.QtGui import QImage, QPixmap
