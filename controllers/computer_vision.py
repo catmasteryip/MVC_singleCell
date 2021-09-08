@@ -144,7 +144,7 @@ class CVThread(QThread):
             # find the biggest countour (c) by the area
             c = max(contours, key = cv2.contourArea)
             x,y,w,h = cv2.boundingRect(c)
-            print(w,tubeFrame.shape[1])
+            # print(w,tubeFrame.shape[1])
 
             if tubeFrame.shape[1]*0.1 < w < tubeFrame.shape[1]*0.9:
                 protrusion_length = w
@@ -153,8 +153,8 @@ class CVThread(QThread):
 
         
 
-        output = np.concatenate((output, rescale(tubeFrame, output)), axis=0)
-        output = np.concatenate((output, rescale(grayBGR, output)), axis=0)
+        output = np.concatenate((tubeFrame, rescale(grayBGR, tubeFrame)), axis=0)
+        # output = np.concatenate((output, rescale(grayBGR, output)), axis=0)
 
         return output, protrusion_length
 
@@ -178,45 +178,45 @@ def cv2Qt(rgbImage):
     return p
 
 def FillHole(img):
-  # im_in = cv2.imread(imgPath, cv2.IMREAD_GRAYSCALE);
-  # im_in = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-  im_in = img
-  # cv2.imwrite("im_in.png", im_in)
-  # 复制 im_in 图像
-  im_floodfill = im_in.copy()
+    # im_in = cv2.imread(imgPath, cv2.IMREAD_GRAYSCALE);
+    # im_in = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    im_in = img
+    # cv2.imwrite("im_in.png", im_in)
+    # 复制 im_in 图像
+    im_floodfill = im_in.copy()
 
-  # Mask 用于 floodFill，官方要求长宽+2
-  h, w = im_in.shape[:2]
-  # print(im_in.shape)
-  mask = np.zeros((h + 2, w + 2), np.uint8)
+    # Mask 用于 floodFill，官方要求长宽+2
+    h, w = im_in.shape[:2]
+    # print(im_in.shape)
+    mask = np.zeros((h + 2, w + 2), np.uint8)
 
-  # floodFill函数中的seedPoint对应像素必须是背景
-  isbreak = False
-  for i in range(im_floodfill.shape[0]):
-      for j in range(im_floodfill.shape[1]):
+    # floodFill函数中的seedPoint对应像素必须是背景
+    isbreak = False
+    for i in range(im_floodfill.shape[0]):
+        for j in range(im_floodfill.shape[1]):
 
-          if (im_floodfill[i][j] == 0):
-              seedPoint = (i, j)
-              isbreak = True
-              # print(im_floodfill[i][j])
-              # print(seedPoint)
-              break
-          else:
-              seedPoint = (0, 0)
-              # print("seedPoint not found ")
-              break
-      if (isbreak):
-          break
+            if (im_floodfill[i][j] == 0):
+                seedPoint = (i, j)
+                isbreak = True
+                # print(im_floodfill[i][j])
+                # print(seedPoint)
+                break
+            else:
+                seedPoint = (0, 0)
+                # print("seedPoint not found ")
+                break
+        if (isbreak):
+            break
 
-  # 得到im_floodfill 255填充非孔洞值
-  cv2.floodFill(im_floodfill, mask, seedPoint, 255,cv2.FLOODFILL_MASK_ONLY)
+    # 得到im_floodfill 255填充非孔洞值
+    cv2.floodFill(im_floodfill, mask, seedPoint, 255,cv2.FLOODFILL_MASK_ONLY)
 
-  # 得到im_floodfill的逆im_floodfill_inv
-  im_floodfill_inv = cv2.bitwise_not(im_floodfill)
+    # 得到im_floodfill的逆im_floodfill_inv
+    im_floodfill_inv = cv2.bitwise_not(im_floodfill)
 
-  # 把im_in、im_floodfill_inv这两幅图像结合起来得到前景
-  im_out = im_in | im_floodfill_inv
+    # 把im_in、im_floodfill_inv这两幅图像结合起来得到前景
+    im_out = im_in | im_floodfill_inv
 
-  # 保存结果
-  # cv2.imwrite(SavePath, im_out)
-  return im_out
+    # 保存结果
+    # cv2.imwrite(SavePath, im_out)
+    return im_out
