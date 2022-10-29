@@ -2,6 +2,7 @@
 
 1. Set up environment according to requirements.txt
 2. Run app.py
+3. To generate UML: pyreverse -Amy -s2 -o png app.py
 
 Demo:
 
